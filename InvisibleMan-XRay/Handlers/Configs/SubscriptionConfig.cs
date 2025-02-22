@@ -13,7 +13,6 @@ namespace InvisibleManXRay.Handlers.Configs
     public class SubscriptionConfig : BaseConfig
     {
         private List<Subscription> groups;
-        private Func<Config> createConfigModel;
 
         public SubscriptionConfig() : base()
         {
@@ -24,7 +23,7 @@ namespace InvisibleManXRay.Handlers.Configs
         {
             LoadFiles(getCurrentConfigPath.Invoke());
         }
-        
+
         public void LoadGroups()
         {
             groups.Clear();
@@ -32,7 +31,7 @@ namespace InvisibleManXRay.Handlers.Configs
             DirectoryInfo directoryInfo = new DirectoryInfo(Directory.CONFIGS);
             if (!directoryInfo.Exists)
                 return;
-            
+
             DirectoryInfo[] directories = directoryInfo.GetDirectories().Where(
                 directory => directory.GetFiles().Any(file => file.Name == "info.dat") &&
                     directory.GetFiles().Count() > 1
@@ -40,7 +39,7 @@ namespace InvisibleManXRay.Handlers.Configs
                 directory => directory.CreationTime
             ).ToArray();
 
-            foreach(DirectoryInfo directory in directories)
+            foreach (DirectoryInfo directory in directories)
             {
                 AddDirectoryToList(directory);
             }
@@ -51,20 +50,22 @@ namespace InvisibleManXRay.Handlers.Configs
             return groups;
         }
 
-        public void CreateSubscription(string remark, string url, string data)
+        public void CreateSubscription(SubscriptionInfo info)
         {
-            string destinationDirectory = $"{Directory.CONFIGS}/{remark}";
-            List<string[]> configs = JsonConvert.DeserializeObject<List<string[]>>(data);
+            string destinationDirectory = $"{Directory.CONFIGS}/{info.Id}";
+            var configs = info.Data;
 
             if (!IsAnyConfigExists())
+            {
                 return;
+            }
 
             CreateInfoFile();
-            foreach(string[] config in configs)
+            foreach (var config in configs)
             {
                 CreateConfigFile(
-                    remark: GetConfigRemark(config), 
-                    data: GetConfigData(config)
+                    config.Id,
+                    JsonConvert.SerializeObject(config.Config)
                 );
             }
 
@@ -73,12 +74,12 @@ namespace InvisibleManXRay.Handlers.Configs
             void CreateInfoFile()
             {
                 string destinationPath = $"{destinationDirectory}/info.dat";
-                SaveToDirectory(destinationPath, url);
+                SaveToDirectory(destinationPath, JsonConvert.SerializeObject(info));
             }
 
-            void CreateConfigFile(string remark, string data)
+            void CreateConfigFile(string id, string data)
             {
-                string destinationPath = $"{destinationDirectory}/{remark}.json";
+                string destinationPath = $"{destinationDirectory}/{id}.json";
                 SaveToDirectory(destinationPath, data);
                 SetFileTime(destinationPath);
                 AddConfigToList(CreateConfigModel(destinationPath));
@@ -93,10 +94,6 @@ namespace InvisibleManXRay.Handlers.Configs
                 FileUtility.SetDirectoryTimeToNow(destinationDirectory);
                 File.WriteAllText(destinationPath, data);
             }
-
-            string GetConfigRemark(string[] config) => config[0];
-
-            string GetConfigData(string[] config) => config[1];
         }
 
         public void DeleteSubscription(Subscription subscription)
@@ -110,8 +107,8 @@ namespace InvisibleManXRay.Handlers.Configs
             LoadGroups();
             configs.Clear();
 
-            if(!IsAnyGroupExists())
-                return;
+            if (!IsAnyGroupExists())
+            { return; }
 
             DirectoryInfo directoryInfo = new DirectoryInfo(GetConfigDirectory());
 
@@ -122,7 +119,7 @@ namespace InvisibleManXRay.Handlers.Configs
                 file => file.Extension != ".dat"
             ).OrderBy(file => file.CreationTime).ToArray();
 
-            foreach(FileInfo file in files)
+            foreach (FileInfo file in files)
             {
                 AddConfigToList(CreateConfigModel(file.FullName));
             }
@@ -135,12 +132,12 @@ namespace InvisibleManXRay.Handlers.Configs
             {
                 string directory = path;
                 if (!FileUtility.IsDirectory(path))
-                    directory = FileUtility.GetDirectory(path);
+                { directory = FileUtility.GetDirectory(path); }
 
                 path = $"{directory}/info.dat";
                 if (!FileUtility.IsFileExists(path))
-                    directory = Directory.CONFIGS;
-                
+                { directory = Directory.CONFIGS; }
+
                 return FileUtility.GetFullPath(directory);
             }
 
@@ -152,9 +149,18 @@ namespace InvisibleManXRay.Handlers.Configs
 
         public override Config CreateConfigModel(string path)
         {
+            var filename = GetFileName(path);
+            var directory = GetDirectory(path);
+            var name = filename;
+            var group = groups.Find(x => x.Directory.FullName == directory);
+            if (group != null)
+            {
+                name = group.Info.Data.Find(x => filename.Contains(x.Id))?.Name;
+            }
+
             return new Config(
-                path: $"{GetDirectory(path)}/{GetFileName(path)}",
-                name: GetFileName(path),
+                path: $"{directory}/{filename}",
+                name,
                 type: ConfigType.FILE,
                 group: GroupType.SUBSCRIPTION,
                 updateTime: GetFileUpdateTime(path)
@@ -163,9 +169,9 @@ namespace InvisibleManXRay.Handlers.Configs
 
         private void AddDirectoryToList(DirectoryInfo directory)
         {
-            groups.Add(new Subscription(FetchUrlFromDirectory(), directory));
+            groups.Add(new Subscription(directory, FetchUrlFromDirectory()));
 
-            string FetchUrlFromDirectory() => File.ReadAllText($"{directory.FullName}/info.dat");
+            SubscriptionInfo FetchUrlFromDirectory() => JsonConvert.DeserializeObject<SubscriptionInfo>(File.ReadAllText($"{directory.FullName}/info.dat"));
         }
     }
 }

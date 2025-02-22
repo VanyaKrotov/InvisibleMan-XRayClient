@@ -32,6 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TUN/*.*">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
     <Content Include="Libraries/*.*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

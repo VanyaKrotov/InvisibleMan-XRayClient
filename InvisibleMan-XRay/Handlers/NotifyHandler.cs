@@ -8,7 +8,6 @@ namespace InvisibleManXRay.Handlers
 {
     using Models;
     using Services;
-    using Services.Analytics.Notify;
     using Values;
 
     public class NotifyHandler : Handler
@@ -26,7 +25,6 @@ namespace InvisibleManXRay.Handlers
         private Dictionary<Mode, ToolStripMenuItem> modeItems;
 
         private LocalizationService LocalizationService => ServiceLocator.Get<LocalizationService>();
-        private AnalyticsService AnalyticsService => ServiceLocator.Get<AnalyticsService>();
 
         public void Setup(
             Func<Mode> getMode,
@@ -138,31 +136,26 @@ namespace InvisibleManXRay.Handlers
 
             void OnProxyModeClick()
             {
-                AnalyticsService.SendEvent(new ProxyModeClickedEvent());
                 onProxyModeClick.Invoke();
             }
 
             void OnTunnelModeClick()
             {
-                AnalyticsService.SendEvent(new TunModeClickedEvent());
                 onTunnelModeClick.Invoke();
             }
 
             void OnOpenClick()
             {
-                AnalyticsService.SendEvent(new OpenClickedEvent());
                 onOpenClick.Invoke();
             }
 
             void OnUpdateClick()
             {
-                AnalyticsService.SendEvent(new CheckForUpdateClickedEvent());
                 onUpdateClick.Invoke();
             }
 
             void OnAboutClick()
             {
-                AnalyticsService.SendEvent(new AboutClickedEvent());
                 onAboutClick.Invoke();
             }
 

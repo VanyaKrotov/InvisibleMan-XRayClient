@@ -41,9 +41,6 @@ namespace InvisibleManXRay.Models
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue(false)]
         public bool IsAutoConnect;
 
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue(true)]
-        public bool IsSendingAnalytics;
-
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue(10801)]
         public int ProxyPort;
 
@@ -77,7 +74,6 @@ namespace InvisibleManXRay.Models
             this.IsRunningAtStartup = false;
             this.IsStartHidden = false;
             this.IsAutoConnect = false;
-            this.IsSendingAnalytics = true;
             this.TunIp = "10.0.236.10";
             this.ProxyPort = 10801;
             this.TunPort = 10802;
@@ -97,7 +93,6 @@ namespace InvisibleManXRay.Models
             bool isRunningAtStartup,
             bool isStartHidden,
             bool isAutoConnect,
-            bool isSendingAnalytics,
             int proxyPort,
             int tunPort,
             int testPort,
@@ -115,7 +110,6 @@ namespace InvisibleManXRay.Models
             this.IsRunningAtStartup = isRunningAtStartup;
             this.IsStartHidden = isStartHidden;
             this.IsAutoConnect = isAutoConnect;
-            this.IsSendingAnalytics = isSendingAnalytics;
             this.ProxyPort = proxyPort;
             this.TunPort = tunPort;
             this.TestPort = testPort;
@@ -143,8 +137,6 @@ namespace InvisibleManXRay.Models
         public bool GetStartHiddenEnabled() => IsStartHidden;
 
         public bool GetAutoConnectEnabled() => IsAutoConnect;
-
-        public bool GetSendingAnalyticsEnabled() => IsSendingAnalytics;
 
         public int GetProxyPort() => ProxyPort;
 

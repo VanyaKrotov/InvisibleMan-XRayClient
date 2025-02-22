@@ -8,7 +8,6 @@ namespace InvisibleManXRay
     using Models;
     using Values;
     using Utilities;
-    using Services.Analytics.ServerWindow;
 
     public partial class ServerWindow : Window
     {
@@ -20,17 +19,17 @@ namespace InvisibleManXRay
 
         private Func<string, List<Config>> getAllSubscriptionConfigs;
         private Func<List<Subscription>> getAllGroups;
-        private Func<string, string, Status> convertLinkToSubscription;
-        private Action<string, string, string> onCreateSubscription;
+        private Func<string, Status> convertLinkToSubscription;
+        private Action<SubscriptionInfo> onCreateSubscription;
         private Action<Subscription> onDeleteSubscription;
 
         public void OpenImportSubscriptionWithLinkSection(string link)
         {
-            pendingToRenderActions = () => {
+            pendingToRenderActions = () =>
+            {
                 OnSubscriptionTabClick(null, null);
                 OnAddSubscriptionButtonClick(null, null);
                 textBoxSubscriptionLink.Text = link;
-                textBoxSubscriptionRemarks.Focus();
             };
         }
 
@@ -62,7 +61,7 @@ namespace InvisibleManXRay
 
         private void OnSubscriptionComboBoxSelectionChanged(object sender, RoutedEventArgs e)
         {
-            if(comboBoxSubscription.SelectedValue == null)
+            if (comboBoxSubscription.SelectedValue == null)
                 return;
 
             groupPath = ((Subscription)comboBoxSubscription.SelectedValue).Directory.FullName;
@@ -73,16 +72,13 @@ namespace InvisibleManXRay
         private void OnAddSubscriptionButtonClick(object sender, RoutedEventArgs e)
         {
             ShowAddSubscriptionsServerPanel();
-            AnalyticsService.SendEvent(new AddSubButtonClickedEvent());
         }
 
         private void OnDeleteSubscriptionButtonClick(object sender, RoutedEventArgs e)
         {
-            AnalyticsService.SendEvent(new SubDeleteButtonClickedEvent());
-
-            if(comboBoxSubscription.SelectedValue == null)
+            if (comboBoxSubscription.SelectedValue == null)
                 return;
-            
+
             string remarks = comboBoxSubscription.Text;
             Subscription subscription = (Subscription)comboBoxSubscription.SelectedValue;
 
@@ -100,8 +96,6 @@ namespace InvisibleManXRay
 
         private void OnEditSubscriptionButtonClick(object sender, RoutedEventArgs e)
         {
-            AnalyticsService.SendEvent(new SubEditButtonClickedEvent());
-
             if (comboBoxSubscription.SelectedValue == null)
                 return;
 
@@ -110,22 +104,18 @@ namespace InvisibleManXRay
 
         private void OnUpdateSubscriptionButtonClick(object sender, RoutedEventArgs e)
         {
-            AnalyticsService.SendEvent(new SubUpdateButtonClickedEvent());
-            
             InitializeTextBoxFields();
             UpdateSubscription();
 
             void InitializeTextBoxFields()
             {
-                textBoxSubscriptionRemarks.Text = comboBoxSubscription.Text;
-                textBoxSubscriptionLink.Text = ((Subscription)comboBoxSubscription.SelectedValue).Url;
+                textBoxSubscriptionLink.Text = ((Subscription)comboBoxSubscription.SelectedValue).Info.Url;
             }
 
             void UpdateSubscription()
             {
                 EditSubscription(
                     subscription: (Subscription)comboBoxSubscription.SelectedValue,
-                    remarks: textBoxSubscriptionRemarks.Text,
                     link: textBoxSubscriptionLink.Text
                 );
             }
@@ -135,15 +125,12 @@ namespace InvisibleManXRay
         {
             if (subscriptionOperation == SubscriptionOperation.CREATE)
             {
-                AnalyticsService.SendEvent(new SubFromLinkImportedEvent());
                 HandleImportingSubscription();
             }
             else if (subscriptionOperation == SubscriptionOperation.EDIT)
             {
-                AnalyticsService.SendEvent(new SubFromLinkEditedEvent());
                 EditSubscription(
                     subscription: (Subscription)comboBoxSubscription.SelectedValue,
-                    remarks: textBoxSubscriptionRemarks.Text,
                     link: textBoxSubscriptionLink.Text
                 );
             }
@@ -151,24 +138,13 @@ namespace InvisibleManXRay
 
         private void HandleImportingSubscription()
         {
-            if (!IsRemarksEntered())
+            if (!IsLinkEntered())
             {
                 MessageBox.Show(
                     this,
-                    LocalizationService.GetTerm(Values.Localization.NO_SUBSCRIPTION_REMARKS_ENTERED), 
-                    Values.Caption.WARNING, 
-                    MessageBoxButton.OK, 
-                    MessageBoxImage.Warning
-                );
-                return;
-            }
-            else if (!IsLinkEntered())
-            {
-                MessageBox.Show(
-                    this,
-                    LocalizationService.GetTerm(Values.Localization.NO_SUBSCRIPTION_LINK_ENTERED), 
-                    Values.Caption.WARNING, 
-                    MessageBoxButton.OK, 
+                    LocalizationService.GetTerm(Values.Localization.NO_SUBSCRIPTION_LINK_ENTERED),
+                    Values.Caption.WARNING,
+                    MessageBoxButton.OK,
                     MessageBoxImage.Warning
                 );
                 return;
@@ -177,8 +153,6 @@ namespace InvisibleManXRay
             SetActiveLoadingPanel(true);
             TryAddSubscription();
 
-            bool IsRemarksEntered() => !string.IsNullOrEmpty(textBoxSubscriptionRemarks.Text);
-
             bool IsLinkEntered() => !string.IsNullOrEmpty(textBoxSubscriptionLink.Text);
 
             void TryAddSubscription()
@@ -186,7 +160,6 @@ namespace InvisibleManXRay
                 Status subscriptionStatus;
 
                 subscriptionStatus = convertLinkToSubscription.Invoke(
-                    textBoxSubscriptionRemarks.Text, 
                     textBoxSubscriptionLink.Text
                 );
 
@@ -197,28 +170,17 @@ namespace InvisibleManXRay
                     return;
                 }
 
-                string[] subscription = GetSubscription();
+                var subscription = (SubscriptionInfo)subscriptionStatus.Content;
                 groupPath = "";
                 onCreateSubscription.Invoke(
-                    GetSubscriptionRemark(), 
-                    GetSubscriptionUrl(), 
-                    GetSubscriptionData()
+                    subscription
                 );
                 onUpdateConfig.Invoke(GetLastConfigPath(GroupType.SUBSCRIPTION));
                 SetActiveLoadingPanel(false);
                 LoadGroupsList();
                 LoadConfigsList(GroupType.SUBSCRIPTION);
-                ClearSubscriptionRemarks();
                 ClearSubscriptionPath();
                 ShowServersPanel();
-
-                string[] GetSubscription() => (string[])subscriptionStatus.Content;
-
-                string GetSubscriptionUrl() => textBoxSubscriptionLink.Text;
-
-                string GetSubscriptionRemark() => subscription[0];
-
-                string GetSubscriptionData() => subscription[1];
 
                 void HandleError()
                 {
@@ -238,7 +200,7 @@ namespace InvisibleManXRay
             }
         }
 
-        private void EditSubscription(Subscription subscription, string remarks, string link)
+        private void EditSubscription(Subscription subscription, string link)
         {
             string oldRemarks = comboBoxSubscription.Text;
 
@@ -263,7 +225,6 @@ namespace InvisibleManXRay
 
             void InitializeTextBoxFields()
             {
-                textBoxSubscriptionRemarks.Text = "";
                 textBoxSubscriptionLink.Text = "";
             }
         }
@@ -282,15 +243,10 @@ namespace InvisibleManXRay
 
             void FetchTextBoxFields()
             {
-                textBoxSubscriptionRemarks.Text = comboBoxSubscription.Text;
-                textBoxSubscriptionLink.Text = ((Subscription)comboBoxSubscription.SelectedValue).Url;
+                textBoxSubscriptionLink.Text = ((Subscription)comboBoxSubscription.SelectedValue).Info.Url;
             }
         }
 
-        private void ClearSubscriptionRemarks()
-        {
-            textBoxSubscriptionRemarks.Text = null;
-        }
 
         private void ClearSubscriptionPath()
         {
@@ -306,9 +262,9 @@ namespace InvisibleManXRay
             void InitializeGroups()
             {
                 groups = new Dictionary<Subscription, string>();
-                foreach(Subscription group in getAllGroups.Invoke())
-                    groups.Add(group, group.Directory.Name);
-                
+                foreach (Subscription group in getAllGroups.Invoke())
+                    groups.Add(group, group.Name);
+
                 comboBoxSubscription.ItemsSource = groups;
             }
 
@@ -323,7 +279,7 @@ namespace InvisibleManXRay
 
                 if (!IsCurrentGroupExists())
                     currentGroup = groups.Last();
-                
+
                 comboBoxSubscription.SelectedValue = currentGroup.Key;
 
                 bool IsCurrentGroupExists() => currentGroup.Key != null && currentGroup.Value != null;
@@ -348,14 +304,14 @@ namespace InvisibleManXRay
             );
 
             AddAllConfigsToList(
-                configs: configs, 
-                configComponents: subscriptionConfigComponents, 
+                configs: configs,
+                configComponents: subscriptionConfigComponents,
                 parent: listSubscriptions
             );
 
             if (IsAnyConfigExists(configs))
                 AddConfigHintAtTheEndOfList(listSubscriptions);
-                
+
             void HandleShowingSubscriptionControlPanel()
             {
                 if (groups.Count > 0)
@@ -371,8 +327,8 @@ namespace InvisibleManXRay
 
             if (!IsConfigExists())
                 lastConfig = getAllGeneralConfigs.Invoke().LastOrDefault();
-            
-            if(!IsConfigExists())
+
+            if (!IsConfigExists())
                 return null;
 
             return lastConfig.Path;

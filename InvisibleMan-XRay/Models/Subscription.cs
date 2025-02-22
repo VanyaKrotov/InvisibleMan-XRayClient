@@ -1,19 +1,33 @@
+using System.Collections.Generic;
 using System.IO;
 
 namespace InvisibleManXRay.Models
 {
     public class Subscription
     {
-        private string url;
         private DirectoryInfo directory;
 
-        public string Url => url;
         public DirectoryInfo Directory => directory;
 
-        public Subscription(string url, DirectoryInfo directory)
+        public string Name => Info.Name;
+
+        public SubscriptionInfo Info;
+
+        public Subscription(DirectoryInfo directory, SubscriptionInfo info)
         {
-            this.url = url;
             this.directory = directory;
+            this.Info = info;
         }
+    }
+
+    public class SubscriptionInfo
+    {
+        public string Name { get; set; }
+
+        public string Id { get; set; }
+
+        public string Url { get; set; }
+
+        public List<ConfigData> Data { get; set; }
     }
 }

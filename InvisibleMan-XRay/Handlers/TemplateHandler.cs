@@ -34,6 +34,6 @@ namespace InvisibleManXRay.Handlers
 
         public Status ConverLinkToConfig(string link) => configTemplate.ConverLinkToConfig(link);
 
-        public Status ConvertLinkToSubscription(string remark, string link) => subscriptionTemplate.ConvertLinkToSubscription(remark, link);
+        public Status ConvertLinkToSubscription(string link) => subscriptionTemplate.ConvertLinkToSubscription(link);
     }
 }

@@ -25,7 +25,6 @@ namespace InvisibleManXRay.Managers.Initializers
             HandlersManager.AddHandler(new NotifyHandler());
             HandlersManager.AddHandler(new VersionHandler());
             HandlersManager.AddHandler(new UpdateHandler());
-            HandlersManager.AddHandler(new BroadcastHandler());
             HandlersManager.AddHandler(new DeepLinkHandler());
             HandlersManager.AddHandler(new LinkHandler());
             HandlersManager.AddHandler(new LocalizationHandler());

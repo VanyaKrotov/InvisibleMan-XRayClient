@@ -18,8 +18,8 @@ namespace InvisibleManXRay.Utilities
             string AllowJustAsciiCharacters(string name)
             {
                 return System.Text.RegularExpressions.Regex.Replace(
-                    input: name, 
-                    pattern: @"[^\u0000-\u007F]+", 
+                    input: name,
+                    pattern: @"[^\u0000-\u007F]+",
                     replacement: string.Empty
                 ).Trim();
             }
@@ -66,6 +66,8 @@ namespace InvisibleManXRay.Utilities
         public static string GetDirectory(string path) => System.IO.Path.GetDirectoryName(path);
 
         public static string GetFileName(string path) => System.IO.Path.GetFileName(path);
+
+        public static string GetDirectoryName(string path) => System.IO.Path.GetDirectoryName(path);
 
         public static string GetFileUpdateTime(string path) => System.IO.File.GetLastWriteTime(path).ToShortDateString();
 

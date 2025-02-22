@@ -247,16 +247,6 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center" Margin="20 0">
-                <TextBlock Grid.Row="2" Text="{DynamicResource Lang.Window.Server.Import.Remarks}" 
-                    Margin="10 0" Foreground="White" VerticalAlignment="Center"
-                    FontFamily="{StaticResource SegoeUI}" 
-                    FontWeight="Normal" FontSize="14"/>
-                
-                <TextBox Margin="20" Height="30" VerticalContentAlignment="Center" 
-                    Style="{StaticResource TextBox.Default}" FontFamily="{StaticResource SegoeUI}" 
-                    FontWeight="Normal" FontSize="14"
-                    x:Name="textBoxSubscriptionRemarks"/>
-
                 <TextBlock Grid.Row="2" Text="{DynamicResource Lang.Window.Server.Import.SubscriptionLink}" 
                     Margin="10 0" Foreground="White" VerticalAlignment="Center"
                     FontFamily="{StaticResource SegoeUI}" 

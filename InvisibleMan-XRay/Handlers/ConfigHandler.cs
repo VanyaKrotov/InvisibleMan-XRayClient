@@ -35,7 +35,7 @@ namespace InvisibleManXRay.Handlers
 
         public void CreateConfig(string remark, string data) => generalConfig.CreateConfig(remark, data);
 
-        public void CreateSubscription(string remark, string url, string data) => subscriptionConfig.CreateSubscription(remark, url, data);
+        public void CreateSubscription(SubscriptionInfo info) => subscriptionConfig.CreateSubscription(info);
 
         public void DeleteSubscription(Subscription subscription) => subscriptionConfig.DeleteSubscription(subscription);
 
@@ -45,13 +45,13 @@ namespace InvisibleManXRay.Handlers
 
         public void RemoveConfigFromList(string path) => GetCurrentBaseConfig().RemoveConfigFromList(path);
 
-        public List<Config> GetAllGeneralConfigs() 
+        public List<Config> GetAllGeneralConfigs()
         {
             generalConfig.LoadFiles();
             return generalConfig.GetAllConfigs();
         }
 
-        public List<Config> GetAllSubscriptionConfigs(string path) 
+        public List<Config> GetAllSubscriptionConfigs(string path)
         {
             subscriptionConfig.LoadFiles(path);
             return subscriptionConfig.GetAllConfigs();
@@ -82,7 +82,7 @@ namespace InvisibleManXRay.Handlers
 
                 if (string.IsNullOrEmpty(path) || !FileUtility.IsFileExists(path))
                     directory = Directory.CONFIGS;
-                
+
                 return FileUtility.GetFullPath(directory);
             }
 

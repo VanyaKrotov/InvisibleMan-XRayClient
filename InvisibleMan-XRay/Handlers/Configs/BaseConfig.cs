@@ -23,9 +23,9 @@ namespace InvisibleManXRay.Handlers.Configs
         public void AddConfigToList(Config config)
         {
             if (configs.ContainsKey(config.Path))
-                configs[config.Path] = config;
+            { configs[config.Path] = config; }
             else
-                configs.Add(config.Path, config);
+            { configs.Add(config.Path, config); }
         }
 
         public void RemoveConfigFromList(string path)
@@ -37,6 +37,8 @@ namespace InvisibleManXRay.Handlers.Configs
         protected void SetFileTime(string path) => FileUtility.SetFileTimeToNow(path);
 
         protected string GetFileName(string path) => FileUtility.GetFileName(path);
+
+        protected string GetDirectoryName(string path) => FileUtility.GetDirectoryName(path);
 
         protected string GetDirectory(string path) => FileUtility.GetDirectory(path);
 

@@ -1,0 +1,1 @@
+dotnet publish ./InvisibleMan-XRay/InvisibleMan-XRay.csproj  -c Release --output build/InvisibleMan-XRay

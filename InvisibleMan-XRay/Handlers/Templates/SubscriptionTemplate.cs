@@ -32,7 +32,7 @@ namespace InvisibleManXRay.Handlers.Templates
             templates.Add(typeof(Simple));
         }
 
-        public Status ConvertLinkToSubscription(string remark, string link)
+        public Status ConvertLinkToSubscription(string link)
         {
             Template template = FindTemplate();
             if (template == null)
@@ -45,9 +45,9 @@ namespace InvisibleManXRay.Handlers.Templates
             Status fetchingStatus = template.FetchDataFromLink(link);
             if (fetchingStatus.Code == Code.ERROR)
                 return fetchingStatus;
-            
-            List<string[]> v2RayList = template.ConvertToV2RayList(convertConfigLinkToV2Ray);
-            if(Isv2RayListEmpty())
+
+            List<ConfigData> v2RayList = template.ConvertToV2RayList(convertConfigLinkToV2Ray);
+            if (Isv2RayListEmpty())
                 return new Status(
                     code: Code.ERROR,
                     subCode: SubCode.INVALID_CONFIG,
@@ -57,15 +57,18 @@ namespace InvisibleManXRay.Handlers.Templates
             return new Status(
                 code: Code.SUCCESS,
                 subCode: SubCode.SUCCESS,
-                content: new string[] { 
-                    template.GetValidRemark(remark), 
-                    JsonConvert.SerializeObject(v2RayList) 
+                content: new SubscriptionInfo()
+                {
+                    Id = template.Id,
+                    Name = template.Title,
+                    Url = link,
+                    Data = v2RayList
                 }
             );
 
             Template FindTemplate()
             {
-                foreach(Type type in templates)
+                foreach (Type type in templates)
                 {
                     Template template = Activator.CreateInstance(type) as Template;
                     if (template.IsValid(link))

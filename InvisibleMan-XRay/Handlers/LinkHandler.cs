@@ -6,8 +6,6 @@ namespace InvisibleManXRay.Handlers
 
     public class LinkHandler : Handler
     {
-        public void OpenWebsiteLink() => OpenLink(Route.WEBSITE);
-
         public void OpenEmailLink() => OpenLink(Route.EMAIL);
 
         public void OpenGitHubRepositoryLink() => OpenLink(Route.REPOSITORY);

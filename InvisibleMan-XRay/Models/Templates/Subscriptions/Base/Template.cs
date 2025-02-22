@@ -11,6 +11,10 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
     {
         protected string Data;
 
+        public string Title;
+
+        public string Id;
+
         protected LocalizationService LocalizationService => ServiceLocator.Get<LocalizationService>();
 
         public abstract bool IsValid(string link);
@@ -19,10 +23,10 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
 
         public string GetValidRemark(string remark) => FileUtility.GetValidFileName(remark);
 
-        public List<string[]> ConvertToV2RayList(Func<string, Status> convertConfigLinkToV2Ray)
+        public List<ConfigData> ConvertToV2RayList(Func<string, Status> convertConfigLinkToV2Ray)
         {
             string data;
-            List<string[]> v2RayList = new List<string[]>();
+            List<ConfigData> v2RayList = new List<ConfigData>();
 
             TryDecode();
             TryConvert();
@@ -33,7 +37,7 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
                 TryDecodeAsBase64();
                 if (IsDecodeSucceeded())
                     return;
-                
+
                 TryDecodeAsStringArray();
                 if (IsDecodeSucceeded())
                     return;
@@ -43,7 +47,7 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
                     try
                     {
                         data = Encoding.UTF8.GetString(
-                            bytes: System.Convert.FromBase64String(Data)
+                            bytes: Convert.FromBase64String(Data)
                         );
                     }
                     catch
@@ -62,23 +66,17 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
 
             void TryConvert()
             {
-                foreach(string link in data.Split("\n"))
+                foreach (string link in data.Split("\n"))
                 {
                     Status convertingStatus = convertConfigLinkToV2Ray.Invoke(link);
                     if (convertingStatus.Code == Code.SUCCESS)
                     {
-                        string[] config = GetConfig(convertingStatus);
+
                         v2RayList.Add(
-                            new[] { GetConfigRemark(config), GetConfigData(config) }
+                           (ConfigData)convertingStatus.Content
                         );
                     }
                 }
-
-                string[] GetConfig(Status configStatus) => (string[])configStatus.Content;
-
-                string GetConfigRemark(string[] config) => config[0];
-
-                string GetConfigData(string[] config) => config[1];
             }
         }
 

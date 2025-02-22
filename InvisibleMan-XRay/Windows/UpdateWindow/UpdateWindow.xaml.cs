@@ -7,7 +7,6 @@ namespace InvisibleManXRay
     using Models;
     using Values;
     using Services;
-    using Services.Analytics.UpdateWindow;
 
     public partial class UpdateWindow : Window
     {
@@ -17,7 +16,6 @@ namespace InvisibleManXRay
         private BackgroundWorker updateWorker;
 
         private LocalizationService LocalizationService => ServiceLocator.Get<LocalizationService>();
-        private AnalyticsService AnalyticsService => ServiceLocator.Get<AnalyticsService>();
 
         public UpdateWindow()
         {
@@ -110,13 +108,11 @@ namespace InvisibleManXRay
         private void OnUpdateButtonClick(object sender, RoutedEventArgs e)
         {
             onUpdateClick.Invoke();
-            AnalyticsService.SendEvent(new UpdateButtonClickedEvent());
         }
 
         private void OnTryAgainButtonClick(object sender, RoutedEventArgs e)
         {
             updateWorker.RunWorkerAsync();
-            AnalyticsService.SendEvent(new RetryButtonClickedEvent());
         }
 
         private void OnCancelButtonClick(object sender, RoutedEventArgs e)
@@ -127,7 +123,6 @@ namespace InvisibleManXRay
         private void OnCloseButtonClick(object sender, RoutedEventArgs e)
         {
             this.Close();
-            AnalyticsService.SendEvent(new CloseButtonClickedEvent());
         }
 
         private void SetActiveCheckForUpdateStatus(bool isShow)

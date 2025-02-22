@@ -8,7 +8,6 @@ namespace InvisibleManXRay.Core
     using Values;
     using Utilities;
     using Services;
-    using Services.Analytics.Core;
 
     public class InvisibleManXRayCore
     {
@@ -29,10 +28,9 @@ namespace InvisibleManXRay.Core
         private Action<string> onFailLoadingConfig;
 
         private LocalizationService LocalizationService => ServiceLocator.Get<LocalizationService>();
-        private AnalyticsService AnalyticsService => ServiceLocator.Get<AnalyticsService>();
 
         public void Setup(
-            Func<Config> getConfig, 
+            Func<Config> getConfig,
             Func<Mode> getMode,
             Func<Protocol> getProtocol,
             Func<LogLevel> getLogLevel,
@@ -44,7 +42,7 @@ namespace InvisibleManXRay.Core
             Func<bool> getUdpEnabled,
             Func<string> getTunIp,
             Func<string> getDns,
-            Func<IProxy> getProxy, 
+            Func<IProxy> getProxy,
             Func<ITunnel> getTunnel,
             Action<string> onFailLoadingConfig)
         {
@@ -64,7 +62,7 @@ namespace InvisibleManXRay.Core
             this.getTunnel = getTunnel;
             this.onFailLoadingConfig = onFailLoadingConfig;
         }
-        
+
         public Status LoadConfig()
         {
             Config config = getConfig.Invoke();
@@ -95,7 +93,7 @@ namespace InvisibleManXRay.Core
         public Status EnableMode()
         {
             Mode mode = getMode.Invoke();
-            
+
             if (mode == Mode.PROXY)
                 return EnableProxy();
             else
@@ -117,22 +115,12 @@ namespace InvisibleManXRay.Core
             bool isSocks = getProtocol.Invoke() == Protocol.SOCKS || mode == Mode.TUN;
             bool isUdpEnabled = getUdpEnabled.Invoke();
 
-            SendServerStartEvent();
             XRayCoreWrapper.StartServer(config, port, logLevel, logPath, isSocks, isUdpEnabled);
-
-            void SendServerStartEvent()
-            {
-                if (mode == Mode.PROXY)
-                    AnalyticsService.SendEvent(new ProxyStartedEvent());
-                else
-                    AnalyticsService.SendEvent(new TunStartedEvent());
-            }
         }
 
         public void Stop()
         {
             XRayCoreWrapper.StopServer();
-            AnalyticsService.SendEvent(new StoppedEvent());
         }
 
         public void Cancel()
@@ -178,7 +166,7 @@ namespace InvisibleManXRay.Core
         {
             if (!ShouldChangeSystemProxy())
                 return;
-            
+
             IProxy proxy = getProxy.Invoke();
             proxy.Disable();
         }
@@ -197,7 +185,7 @@ namespace InvisibleManXRay.Core
             int port = getTunPort.Invoke();
             string address = getTunIp.Invoke();
             string dns = getDns.Invoke();
-            
+
             ITunnel tunnel = getTunnel.Invoke();
 
             return tunnel.Enable(
@@ -214,7 +202,7 @@ namespace InvisibleManXRay.Core
 
                 if (config == null)
                     return new Status(Code.ERROR, SubCode.NO_CONFIG, LocalizationService.GetTerm(Localization.NO_CONFIGS_FOUND));
-                
+
                 return new Status(Code.SUCCESS, SubCode.SUCCESS, System.IO.File.ReadAllText(config.Path).ToLower());
             }
         }

@@ -11,14 +11,17 @@ namespace InvisibleManXRay.Models.Templates.Configs
         protected abstract V2Ray.Outbound.Settings OutboundSettings { get; }
 
         protected LocalizationService LocalizationService => ServiceLocator.Get<LocalizationService>();
-        
+
         public abstract Status FetchDataFromLink(string link);
 
-        public string GetValidRemark() => FileUtility.GetValidFileName(Adapter.remark);
-        
+        public string GetValidRemark() => Adapter.remark;
+
+        public string GetAddress() => Adapter.address;
+
         public V2Ray ConvertToV2Ray()
         {
-            v2Ray = new V2Ray() {
+            v2Ray = new V2Ray()
+            {
                 log = Log,
                 inbounds = Inbounds,
                 outbounds = Outbounds
@@ -27,7 +30,8 @@ namespace InvisibleManXRay.Models.Templates.Configs
             return v2Ray;
         }
 
-        private V2Ray.Log Log => new V2Ray.Log() {
+        private V2Ray.Log Log => new V2Ray.Log()
+        {
             loglevel = Global.DEFAULT_LOG_LEVEL,
             access = "",
             error = ""
@@ -46,6 +50,7 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
         private V2Ray.Outbound[] Outbounds => new V2Ray.Outbound[] {
             new V2Ray.Outbound() {
+                tag = Adapter.remark,
                 protocol = Adapter.type,
                 settings = OutboundSettings,
                 streamSettings = new V2Ray.StreamSettings() {
@@ -71,7 +76,8 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.streamSecurity == Global.StreamSecurity.TLS)
                 {
-                    tlsSettings = new V2Ray.StreamSettings.TlsSettings() {
+                    tlsSettings = new V2Ray.StreamSettings.TlsSettings()
+                    {
                         allowInsecure = Adapter.allowInsecure,
                         fingerprint = Adapter.fingerprint
                     };
@@ -99,7 +105,8 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.streamSecurity == Global.StreamSecurity.XTLS)
                 {
-                    xtlsSettings = new V2Ray.StreamSettings.TlsSettings() {
+                    xtlsSettings = new V2Ray.StreamSettings.TlsSettings()
+                    {
                         allowInsecure = Adapter.allowInsecure,
                         alpn = new[] { Adapter.alpn },
                         fingerprint = Adapter.fingerprint
@@ -126,10 +133,11 @@ namespace InvisibleManXRay.Models.Templates.Configs
                     wsSettings = new V2Ray.StreamSettings.WsSettings();
 
                     if (!string.IsNullOrWhiteSpace(Adapter.requestHost))
-                        wsSettings.headers = new V2Ray.StreamSettings.WsSettings.Headers() {
+                        wsSettings.headers = new V2Ray.StreamSettings.WsSettings.Headers()
+                        {
                             Host = Adapter.requestHost
                         };
-                    
+
                     if (!string.IsNullOrWhiteSpace(Adapter.path))
                         wsSettings.path = Adapter.path;
                 }
@@ -146,7 +154,8 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.streamNetwork == Global.StreamNetwork.H2)
                 {
-                    httpSettings = new V2Ray.StreamSettings.HttpSettings() {
+                    httpSettings = new V2Ray.StreamSettings.HttpSettings()
+                    {
                         path = Adapter.path
                     };
 
@@ -166,10 +175,12 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.streamNetwork == Global.StreamNetwork.QUIC)
                 {
-                    quicSettings = new V2Ray.StreamSettings.QuicSettings() {
+                    quicSettings = new V2Ray.StreamSettings.QuicSettings()
+                    {
                         security = Adapter.requestHost,
                         key = Adapter.path,
-                        header = new V2Ray.Header() {
+                        header = new V2Ray.Header()
+                        {
                             type = Adapter.headerType
                         }
                     };
@@ -187,7 +198,8 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.streamNetwork == Global.StreamNetwork.GRPC)
                 {
-                    grpcSettings = new V2Ray.StreamSettings.GrpcSettings() {
+                    grpcSettings = new V2Ray.StreamSettings.GrpcSettings()
+                    {
                         serviceName = Adapter.path,
                         multiMode = (Adapter.headerType == "multi")
                     };
@@ -205,8 +217,10 @@ namespace InvisibleManXRay.Models.Templates.Configs
 
                 if (Adapter.headerType == "http")
                 {
-                    tcpSettings = new V2Ray.StreamSettings.TcpSettings() {
-                        header = new V2Ray.Header() {
+                    tcpSettings = new V2Ray.StreamSettings.TcpSettings()
+                    {
+                        header = new V2Ray.Header()
+                        {
                             type = Adapter.headerType,
                             request = GetRequest()
                         }
@@ -227,7 +241,7 @@ namespace InvisibleManXRay.Models.Templates.Configs
                         'Connection':['keep-alive'],
                         'Pragma':'no-cache'}}
                     ";
-                    
+
                     string[] hostArray = Adapter.requestHost.Split(',');
                     string hostsString = string.Join("','", hostArray);
                     request = request.Replace("$requestHost$", $"'{hostsString}'");

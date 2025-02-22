@@ -21,8 +21,6 @@ namespace InvisibleManXRay
         private Func<string, int> testConnection;
         private Func<string> getLogPath;
 
-        private AnalyticsService AnalyticsService => ServiceLocator.Get<AnalyticsService>();
-
         public ServerWindow()
         {
             InitializeComponent();
@@ -34,17 +32,17 @@ namespace InvisibleManXRay
         public void Setup(
             Func<string> getCurrentConfigPath,
             Func<bool> isCurrentPathEqualRootConfigPath,
-            Func<List<Config>> getAllGeneralConfigs, 
+            Func<List<Config>> getAllGeneralConfigs,
             Func<string, List<Config>> getAllSubscriptionConfigs,
             Func<List<Subscription>> getAllGroups,
             Func<string, Status> convertLinkToConfig,
-            Func<string, string, Status> convertLinkToSubscription,
-            Func<string, Status> loadConfig, 
+            Func<string, Status> convertLinkToSubscription,
+            Func<string, Status> loadConfig,
             Func<string, int> testConnection,
             Func<string> getLogPath,
             Action<string> onCopyConfig,
             Action<string, string> onCreateConfig,
-            Action<string, string, string> onCreateSubscription,
+            Action<SubscriptionInfo> onCreateSubscription,
             Action<Subscription> onDeleteSubscription,
             Action<GroupType, string> onDeleteConfig,
             Action<string> onUpdateConfig)
@@ -75,7 +73,7 @@ namespace InvisibleManXRay
             ShowServersPanel();
             HandleShowingActiveTab();
             ExecutePendingToRenderActions();
-            
+
             void LoadConfigsLists()
             {
                 LoadConfigsList(GroupType.GENERAL);
@@ -129,8 +127,8 @@ namespace InvisibleManXRay
         }
 
         private void HandleShowingNoServerExistsHint(
-            List<Config> configs, 
-            List<Subscription> groups, 
+            List<Config> configs,
+            List<Subscription> groups,
             TextBlock textNoServer
         )
         {
@@ -156,12 +154,14 @@ namespace InvisibleManXRay
             {
                 Components.Config configComponent = new Components.Config();
                 configComponent.Setup(
-                    config: config, 
-                    onSelect: () => {
+                    config: config,
+                    onSelect: () =>
+                    {
                         onUpdateConfig.Invoke(config.Path);
                         SelectConfig(config.Path);
                     },
-                    onDelete: () => {
+                    onDelete: () =>
+                    {
                         onDeleteConfig.Invoke(config.Group, config.Path);
                         groupPath = config.Path;
                         HandleReloadingGroupsList();
@@ -174,22 +174,23 @@ namespace InvisibleManXRay
                             if (config.Group == GroupType.SUBSCRIPTION && configs.Count == 1)
                                 LoadGroupsList();
                         }
-                        
+
                         void HandleCurrentConfigPath()
                         {
-                            if(IsCurrentConfigDeleted())
+                            if (IsCurrentConfigDeleted())
                                 onUpdateConfig.Invoke(GetLastConfigPath(config.Group));
-                            
+
                             bool IsCurrentConfigDeleted() => getCurrentConfigPath.Invoke() == config.Path;
                         }
                     },
-                    onShare: (content) => {
+                    onShare: (content) =>
+                    {
                         QRCodeGenerator qrGenerator = new QRCodeGenerator();
                         QRCodeData qrCodeData = qrGenerator.CreateQrCode(
                             plainText: content,
                             eccLevel: QRCodeGenerator.ECCLevel.Default
                         );
-                        
+
                         XamlQRCode qrCode = new XamlQRCode(qrCodeData);
                         DrawingImage qrCodeAsXaml = qrCode.GetGraphic(20);
                         imageQrCode.Source = qrCodeAsXaml;
@@ -197,11 +198,12 @@ namespace InvisibleManXRay
                         SetActiveSharePanel(true);
                     },
                     getServerWindow: () => this,
-                    testConnection: (configPath) => {
+                    testConnection: (configPath) =>
+                    {
                         Status configStatus = loadConfig.Invoke(configPath);
                         if (configStatus.Code == Code.ERROR)
                             return Availability.ERROR;
-                            
+
                         return testConnection.Invoke(configStatus.Content.ToString());
                     },
                     getLogPath: getLogPath
@@ -211,8 +213,8 @@ namespace InvisibleManXRay
             }
 
             void AddConfigToList(
-                Components.Config config, 
-                List<Components.Config> configComponentsList, 
+                Components.Config config,
+                List<Components.Config> configComponentsList,
                 StackPanel parent
             )
             {
@@ -237,7 +239,7 @@ namespace InvisibleManXRay
                 return GetLastGeneralConfigPath();
             else
                 return GetLastSubscriptionConfigPath();
-        } 
+        }
 
         private void SelectConfig(string path)
         {
@@ -256,7 +258,7 @@ namespace InvisibleManXRay
                     );
                 }
             }
-            
+
             void SelectConfig()
             {
                 Components.Config configComponent = FindConfigInComponentsList(generalConfigComponents);
@@ -278,7 +280,7 @@ namespace InvisibleManXRay
                 }
 
                 bool IsAnyConfigExists() => configComponent != null;
-            } 
+            }
         }
 
         private void DeleteSubscription(Subscription subscription)
@@ -298,7 +300,7 @@ namespace InvisibleManXRay
         {
             panel.Visibility = isActive ? Visibility.Visible : Visibility.Hidden;
         }
-        
+
         private void HideAllPanels()
         {
             SetActiveConfigPanel(false);
@@ -320,9 +322,9 @@ namespace InvisibleManXRay
         {
             MessageBoxResult result = MessageBox.Show(
                 this,
-                message, 
-                Caption.WARNING, 
-                MessageBoxButton.OK, 
+                message,
+                Caption.WARNING,
+                MessageBoxButton.OK,
                 MessageBoxImage.Warning
             );
         }
@@ -331,9 +333,9 @@ namespace InvisibleManXRay
         {
             MessageBox.Show(
                 this,
-                message, 
-                Caption.ERROR, 
-                MessageBoxButton.OK, 
+                message,
+                Caption.ERROR,
+                MessageBoxButton.OK,
                 MessageBoxImage.Error
             );
         }

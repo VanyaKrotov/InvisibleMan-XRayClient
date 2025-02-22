@@ -1,3 +1,5 @@
+using InvisibleManXRay.Models.Templates.Configs;
+
 namespace InvisibleManXRay.Models
 {
     public enum ConfigType { FILE, URL }
@@ -20,7 +22,7 @@ namespace InvisibleManXRay.Models
         public GroupType Group => group;
         public int Availability => availability;
 
-        public Config(string path, string name, ConfigType type, GroupType group, string updateTime)
+        public Config(string path,  string name, ConfigType type, GroupType group, string updateTime)
         {
             this.path = path;
             this.name = name;
@@ -29,7 +31,16 @@ namespace InvisibleManXRay.Models
             this.updateTime = updateTime;
             this.availability = Values.Availability.NOT_CHECKED;
         }
-        
+
         public void SetAvailability(int availability) => this.availability = availability;
+    }
+
+    public class ConfigData
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+
+        public V2Ray Config { get; set; }
     }
 }

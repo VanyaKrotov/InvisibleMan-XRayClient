@@ -28,7 +28,6 @@ namespace InvisibleManXRay.Factories
         {
             ConfigHandler configHandler = handlersManager.GetHandler<ConfigHandler>();
             UpdateHandler updateHandler = handlersManager.GetHandler<UpdateHandler>();
-            BroadcastHandler broadcastHandler = handlersManager.GetHandler<BroadcastHandler>();
             SettingsHandler settingsHandler = handlersManager.GetHandler<SettingsHandler>();
             LinkHandler linkHandler = handlersManager.GetHandler<LinkHandler>();
 
@@ -41,7 +40,6 @@ namespace InvisibleManXRay.Factories
                 loadConfig: core.LoadConfig,
                 enableMode: core.EnableMode,
                 checkForUpdate: updateHandler.CheckForUpdate,
-                checkForBroadcast: broadcastHandler.CheckForBroadcast,
                 openServerWindow: CreateServerWindow,
                 openSettingsWindow: CreateSettingsWindow,
                 openUpdateWindow: CreateUpdateWindow,
@@ -56,7 +54,7 @@ namespace InvisibleManXRay.Factories
                 onBugReportingClick: linkHandler.OpenBugReportingLink,
                 onCustomLinkClick: linkHandler.OpenCustomLink
             );
-            
+
             return mainWindow;
 
             bool IsNeedToShowPolicyWindow() => settingsHandler.UserSettings.GetClientId() == "";
@@ -82,7 +80,6 @@ namespace InvisibleManXRay.Factories
                 getRunningAtStartupEnabled: settingsHandler.UserSettings.GetRunningAtStartupEnabled,
                 getStartHiddenEnabled: settingsHandler.UserSettings.GetStartHiddenEnabled,
                 getAutoConnectEnabled: settingsHandler.UserSettings.GetAutoConnectEnabled,
-                getSendingAnalyticsEnabled: settingsHandler.UserSettings.GetSendingAnalyticsEnabled,
                 getProxyPort: settingsHandler.UserSettings.GetProxyPort,
                 getTunPort: settingsHandler.UserSettings.GetTunPort,
                 getTestPort: settingsHandler.UserSettings.GetTestPort,
@@ -140,7 +137,6 @@ namespace InvisibleManXRay.Factories
                 getApplicationVersion: GetApplicationVersion,
                 getXRayCoreVersion: GetXRayCoreVersion,
                 onEmailClick: linkHandler.OpenEmailLink,
-                onWebsiteClick: linkHandler.OpenWebsiteLink,
                 onBugReportingClick: linkHandler.OpenBugReportingLink
             );
 
@@ -169,8 +165,9 @@ namespace InvisibleManXRay.Factories
             TemplateHandler templateHandler = handlersManager.GetHandler<TemplateHandler>();
             SettingsHandler settingsHandler = handlersManager.GetHandler<SettingsHandler>();
             MainWindow mainWindow = GetMainWindow();
-            
+
             ServerWindow serverWindow = new ServerWindow();
+
             serverWindow.Setup(
                 getCurrentConfigPath: settingsHandler.UserSettings.GetCurrentConfigPath,
                 isCurrentPathEqualRootConfigPath: configHandler.IsCurrentPathEqualRootConfigPath,
@@ -194,7 +191,7 @@ namespace InvisibleManXRay.Factories
                 window: serverWindow,
                 term: Localization.WINDOW_TITLE_SERVER
             );
-            
+
             return serverWindow;
 
             void UpdateConfig(string path)

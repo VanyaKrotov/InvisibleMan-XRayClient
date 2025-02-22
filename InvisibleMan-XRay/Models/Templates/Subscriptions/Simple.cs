@@ -3,6 +3,7 @@ using System.Net;
 
 namespace InvisibleManXRay.Models.Templates.Subscriptions
 {
+    using System.Text;
     using Values;
 
     public class Simple : Template
@@ -17,9 +18,32 @@ namespace InvisibleManXRay.Models.Templates.Subscriptions
             try
             {
                 WebClient webClient = new WebClient();
+
+                webClient.Headers.Add("User-Agent", "InvisibleMan(win64)");
+                webClient.Headers.Add("Content-Type", "application/json");
+                webClient.Headers.Add("accept", "*/*");
+
                 Data = webClient.DownloadString(link);
+                var title = webClient.ResponseHeaders.Get("profile-title");
+                if (title.StartsWith("base64:"))
+                {
+                    Title = Encoding.UTF8.GetString(Convert.FromBase64String(title.Substring(7)));
+                }
+                else
+                {
+                    Title = title;
+                }
+
+                var test = webClient.ResponseHeaders.Get("Content-Disposition");
+                if (!string.IsNullOrEmpty(test))
+                {
+                    Id = test.Split(" ")[1].Split("=")[1].Replace("\"", "");
+                }
+
                 if (!IsAnyDataExisits())
+                {
                     throw new Exception();
+                }
 
                 return new Status(Code.SUCCESS, SubCode.SUCCESS, null);
             }
