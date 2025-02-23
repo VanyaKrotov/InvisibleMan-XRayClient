@@ -7,6 +7,7 @@
     <AssemblyName>Invisible Man XRay</AssemblyName>
     <Product>Invisible Man XRay</Product>
     <PackageId>Invisible Man XRay</PackageId>
+    <PublisherName>Bear VPN</PublisherName>
     <Company>Invisible Man</Company>
     <Copyright>Copyright (C) 2025 Invisible Man</Copyright>
     <Version>3.2.5.0</Version>

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using InvisibleManXRay.Values;
 using Newtonsoft.Json;
 
 namespace InvisibleManXRay.Models
@@ -14,7 +15,7 @@ namespace InvisibleManXRay.Models
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue("")]
         public string ClientId;
 
-        [JsonProperty(PropertyName = "language", DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue("en-US")]
+        [JsonProperty(PropertyName = "language", DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue("ru-RU")]
         public string Language;
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate), DefaultValue("./Configs")]
@@ -65,7 +66,7 @@ namespace InvisibleManXRay.Models
         public UserSettings()
         {
             this.ClientId = "";
-            this.Language = "en-US";
+            this.Language = Localization.DEFAULT_LANGUAGE;
             this.CurrentConfigPath = "./Configs";
             this.Mode = Mode.PROXY;
             this.Protocol = Protocol.HTTP;

@@ -7,7 +7,6 @@ using System.Windows.Controls;
 namespace InvisibleManXRay
 {
     using Models;
-    using Services;
 
     public partial class SettingsWindow : Window
     {
@@ -47,10 +46,9 @@ namespace InvisibleManXRay
         private Func<int> getTunPort;
         private Func<int> getTestPort;
         private Func<string> getDeviceIp;
-        private Func<String> getDns;
+        private Func<string> getDns;
         private Func<LogLevel> getLogLevel;
         private Func<string> getLogPath;
-        private Func<PolicyWindow> openPolicyWindow;
 
         private Action<UserSettings> onUpdateUserSettings;
 
@@ -92,7 +90,6 @@ namespace InvisibleManXRay
             Func<string> getDns,
             Func<LogLevel> getLogLevel,
             Func<string> getLogPath,
-            Func<PolicyWindow> openPolicyWindow,
             Action<UserSettings> onUpdateUserSettings
         )
         {
@@ -111,7 +108,6 @@ namespace InvisibleManXRay
             this.getDns = getDns;
             this.getLogLevel = getLogLevel;
             this.getLogPath = getLogPath;
-            this.openPolicyWindow = openPolicyWindow;
             this.onUpdateUserSettings = onUpdateUserSettings;
 
             UpdateUI();

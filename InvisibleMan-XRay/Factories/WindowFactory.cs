@@ -44,7 +44,6 @@ namespace InvisibleManXRay.Factories
                 openSettingsWindow: CreateSettingsWindow,
                 openUpdateWindow: CreateUpdateWindow,
                 openAboutWindow: CreateAboutWindow,
-                openPolicyWindow: CreatePolicyWindow,
                 onRunServer: core.Run,
                 onStopServer: core.Stop,
                 onCancelServer: core.Cancel,
@@ -87,7 +86,6 @@ namespace InvisibleManXRay.Factories
                 getDns: settingsHandler.UserSettings.GetDns,
                 getLogLevel: settingsHandler.UserSettings.GetLogLevel,
                 getLogPath: settingsHandler.UserSettings.GetLogPath,
-                openPolicyWindow: CreatePolicyWindow,
                 onUpdateUserSettings: UpdateUserSettings
             );
 
@@ -200,23 +198,6 @@ namespace InvisibleManXRay.Factories
                 mainWindow.UpdateUI();
                 mainWindow.TryRerun();
             }
-        }
-
-        public PolicyWindow CreatePolicyWindow()
-        {
-            LinkHandler linkHandler = handlersManager.GetHandler<LinkHandler>();
-
-            PolicyWindow policyWindow = new PolicyWindow();
-            policyWindow.Setup(
-                onEmailClick: linkHandler.OpenEmailLink
-            );
-
-            SetupLocalizedWindowTitle(
-                window: policyWindow,
-                term: Localization.WINDOW_TITLE_POLICY
-            );
-
-            return policyWindow;
         }
 
         private void SetupLocalizedWindowTitle(Window window, string term)

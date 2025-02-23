@@ -22,7 +22,6 @@ namespace InvisibleManXRay
         private Func<SettingsWindow> openSettingsWindow;
         private Func<UpdateWindow> openUpdateWindow;
         private Func<AboutWindow> openAboutWindow;
-        private Func<PolicyWindow> openPolicyWindow;
         private Action<string> onRunServer;
         private Action onCancelServer;
         private Action onStopServer;
@@ -208,7 +207,6 @@ namespace InvisibleManXRay
             Func<SettingsWindow> openSettingsWindow,
             Func<UpdateWindow> openUpdateWindow,
             Func<AboutWindow> openAboutWindow,
-            Func<PolicyWindow> openPolicyWindow,
             Action<string> onRunServer,
             Action onStopServer,
             Action onCancelServer,
@@ -228,7 +226,6 @@ namespace InvisibleManXRay
             this.openSettingsWindow = openSettingsWindow;
             this.openUpdateWindow = openUpdateWindow;
             this.openAboutWindow = openAboutWindow;
-            this.openPolicyWindow = openPolicyWindow;
             this.onRunServer = onRunServer;
             this.onCancelServer = onCancelServer;
             this.onStopServer = onStopServer;
@@ -244,7 +241,6 @@ namespace InvisibleManXRay
 
         protected override void OnContentRendered(EventArgs e)
         {
-            TryOpenPolicyWindow();
             TryStartHidden();
             TryAutoConnect();
         }
@@ -353,18 +349,6 @@ namespace InvisibleManXRay
                 return;
 
             OnRunButtonClick(null, null);
-        }
-
-        private void TryOpenPolicyWindow()
-        {
-            if (!isNeedToShowPolicyWindow.Invoke())
-                return;
-
-            onGenerateClientId.Invoke();
-
-            PolicyWindow policyWindow = openPolicyWindow.Invoke();
-            policyWindow.Owner = this;
-            policyWindow.ShowDialog();
         }
 
         private void OpenServerWindow()
